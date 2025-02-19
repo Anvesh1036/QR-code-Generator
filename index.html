@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>QR Code Generator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #f4f4f4;
+    }
+
+    .container {
+      text-align: center;
+      padding: 30px;
+      border-radius: 8px;
+      background-color: #fff;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      width: 300px;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      background-color: #4CAF50;
+      color: white;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    #qrCode {
+      margin-top: 20px;
+    }
+
+    /* Restrict the displayed QR code size in the browser */
+    .qr-image {
+      max-width: 200px; /* Adjust to your preferred size */
+      height: auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>QR Code Generator</h1>
+    <form id="qrForm">
+      <input type="text" id="qrText" placeholder="Enter text for QR code" required />
+      <button type="submit">Generate QR Code</button>
+    </form>
+    <div id="qrCode"></div>
+  </div>
+
+  <script>
+    document.getElementById('qrForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+      const text = document.getElementById('qrText').value;
+      
+      // Send request to Flask backend
+      fetch(`/generate?qrcode=${encodeURIComponent(text)}`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.error) {
+            alert(data.error);
+          } else {
+            // Insert the QR code image
+            document.getElementById('qrCode').innerHTML = `
+              <img 
+                src="data:image/png;base64,${data.qr_code}" 
+                alt="QR Code" 
+                class="qr-image"
+              />
+            `;
+          }
+        })
+        .catch(error => console.error('Error:', error));
+    });
+  </script>
+</body>
+</html>
